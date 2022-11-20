@@ -13,12 +13,75 @@ import {
   Link,
 } from "@chakra-ui/react";
 
-import Head from "next/head";
-import Image from "next/image";
+import { useContext, useEffect, useState } from "react";
+import backend from "../api/backend";
 import Navbar from "../components/navbar";
-import styles from "../styles/Home.module.css";
+import { AuthContext } from "../utils/AuthContext";
 
 export default function Home() {
+  const [mahasiswas, setMahasiswas] = useState([]);
+  const [user, setUser] = useState(null);
+  const { token, setToken } = useContext(AuthContext);
+
+  const getAllMahasiswa = async () => {
+    try {
+      const res = await backend.get(`/mahasiswa`);
+
+      console.log(res.data.data.mahasiswa);
+      setMahasiswas(res.data.data.mahasiswa);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const hasUserLogedIn = async () => {
+    try {
+      const res = await backend.get("/mahasiswa/profile", {
+        headers: {
+          token,
+          validateStatus: false,
+        },
+      });
+
+      if (res.status !== 200) {
+        alert(res.data.message);
+        return;
+      }
+
+      return setUser(res.data.mahasiswa);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+  };
+
+  const handleDelete = async (nim) => {
+    try {
+      const res = await backend.delete(`/mahasiswa/${nim}`, {
+        headers: {
+          token,
+          validateStatus: false,
+        },
+      });
+
+      const data = res.data;
+      console.log(data);
+      getAllMahasiswa();
+      handleLogout();
+      alert("mahasiswa deleted");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    hasUserLogedIn();
+    getAllMahasiswa();
+  }, [token]);
   return (
     <Box
       justifyContent="center"
@@ -29,7 +92,7 @@ export default function Home() {
       pb={10}
       px={10}
     >
-      <Navbar />
+      <Navbar user={user} handleLogout={handleLogout} />
 
       <Box
         rounded="lg"
@@ -45,30 +108,35 @@ export default function Home() {
                 <Th>NIM</Th>
                 <Th>Nama</Th>
                 <Th>Angkatan</Th>
-                <Th>Prodi</Th>
                 <Th>Action</Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>1</Td>
-                <Td>195150701111021</Td>
-                <Td>Test User</Td>
-                <Td>2019</Td>
-                <Td>Teknologi Informasi</Td>
-                <Td>
-                  <ButtonGroup>
-                    <Link href={`/users/:id`} key={`id`}>
-                      <Button size="sm" colorScheme="green">
-                        Detail
-                      </Button>
-                    </Link>
-                    <Button size="sm" colorScheme="red">
-                      Delete
-                    </Button>
-                  </ButtonGroup>
-                </Td>
-              </Tr>
+              {mahasiswas &&
+                mahasiswas.map((mahasiswa, index) => (
+                  <Tr key={mahasiswa.nim}>
+                    <Td>{index + 1}</Td>
+                    <Td>{mahasiswa.nim}</Td>
+                    <Td>{mahasiswa.nama}</Td>
+                    <Td>{mahasiswa.angkatan}</Td>
+                    <Td>
+                      <ButtonGroup>
+                        <Link href={`/users/${mahasiswa.nim}`}>
+                          <Button size="sm" colorScheme="green">
+                            Detail
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          onClick={() => handleDelete}
+                        >
+                          Delete
+                        </Button>
+                      </ButtonGroup>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>

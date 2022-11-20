@@ -21,6 +21,8 @@ import {
 import { BiIdCard, BiLockAlt, BiShow, BiHide, BiUser } from "react-icons/bi";
 
 import { MdArrowDropDown } from "react-icons/md";
+import { useRouter } from "next/router";
+import backend from "../api/backend";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,17 +30,34 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [nama, setNama] = useState("");
   const [angkatan, setAngkatan] = useState("");
-  const [prodi, setProdi] = useState("");
+
+  const router = useRouter();
 
   const handleShowPassword = () => setShowPassword(!showPassword);
 
+  const registerUser = async (values) => {
+    try {
+      const res = await backend.post("/auth/register", values, {
+        validateStatus: false,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("nim: ", nim);
-    console.log("nama: ", nama);
-    console.log("prodi: ", prodi);
-    console.log("angkatan: ", angkatan);
-    console.log("password: ", password);
+    const values = {
+      nim,
+      nama,
+      angkatan,
+      password,
+    };
+
+    registerUser(values);
+    router.push("/login");
   };
 
   return (
@@ -87,31 +106,6 @@ const Register = () => {
                     value={nama}
                     onChange={(e) => setNama(e.target.value)}
                   ></Input>
-                </InputGroup>
-              </FormControl>
-              <FormControl>
-                <InputGroup>
-                  <Select
-                    placeholder="Prodi"
-                    icon={<MdArrowDropDown />}
-                    value={prodi}
-                    onChange={(e) => setProdi(e.target.value)}
-                  >
-                    <option value="Teknologi Informasi">
-                      Teknologi Informasi
-                    </option>
-                    <option value="Sistem Informasi">Sistem Informasi</option>
-                    <option value="Pendidikan Teknologi Informasi">
-                      Pendidikan Teknologi Informasi
-                    </option>
-                    <option value="Teknik Informatika">
-                      Teknik Informatika
-                    </option>
-                    <option value="Teknik Informatika">
-                      Teknik Informatika
-                    </option>
-                    <option value="Teknik Komputer">Teknik Komputer</option>
-                  </Select>
                 </InputGroup>
               </FormControl>
               <FormControl>
