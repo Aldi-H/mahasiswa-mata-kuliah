@@ -12,6 +12,7 @@ import {
   useColorModeValue,
   Link,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 import { useContext, useEffect, useState } from "react";
 import backend from "../api/backend";
@@ -22,13 +23,14 @@ export default function Home() {
   const [mahasiswas, setMahasiswas] = useState([]);
   const [user, setUser] = useState(null);
   const { token, setToken } = useContext(AuthContext);
+  const router = useRouter();
 
   const getAllMahasiswa = async () => {
     try {
       const res = await backend.get(`/mahasiswa`);
 
-      console.log(res.data.data.mahasiswa);
-      setMahasiswas(res.data.data.mahasiswa);
+      console.log(res.data.mahasiswa);
+      setMahasiswas(res.data.mahasiswa);
     } catch (error) {
       console.log(error);
     }
@@ -121,11 +123,9 @@ export default function Home() {
                     <Td>{mahasiswa.angkatan}</Td>
                     <Td>
                       <ButtonGroup>
-                        <Link href={`/users/${mahasiswa.nim}`}>
-                          <Button size="sm" colorScheme="green">
-                            Detail
-                          </Button>
-                        </Link>
+                        <Button size="sm" colorScheme="green" onClick={() => router.push(`/users/${mahasiswa.nim}`)}>
+                          Detail
+                        </Button>
                         <Button
                           size="sm"
                           colorScheme="red"
