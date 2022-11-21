@@ -77,7 +77,6 @@ const Detail = () => {
     }
   };
 
-  // add matakuliah
   const addMk = async (e) => {
     e.preventDefault();
     try {
@@ -132,7 +131,7 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleLogout = () => {
     setToken(null);
@@ -155,7 +154,12 @@ const Detail = () => {
       pb={10}
       px={10}
     >
-      <Navbar user={user} handleLogout={handleLogout} />
+      <Navbar
+        user={user}
+        handleLogout={handleLogout}
+        handleLogin={() => router.push("/login")}
+        homepage={() => router.push("/")}
+      />
       <Center py={6}>
         <Box
           maxW="5xl"
@@ -182,24 +186,24 @@ const Detail = () => {
 
           <form onSubmit={addMk}>
             <FormControl p={8}>
-                <InputGroup>
-                  <Select
-                    placeholder="Pilih Mata Kuliah"
-                    icon={<MdArrowDropDown />}
-                    value={mk}
-                    onChange={(e) => setMk(e.target.value)}
-                  >
-                    {mkList &&
-                      mkList.map((mkList) => (
-                        <option value={mkList.id} key={mkList.id}>
-                          {mkList.id + " " + mkList.nama}
-                        </option>
-                      ))}
-                  </Select>
-                  <Button type="submit" size="md" colorScheme="green" mx={4}>
-                    Add
-                  </Button>
-                </InputGroup>
+              <InputGroup>
+                <Select
+                  placeholder="Pilih Mata Kuliah"
+                  icon={<MdArrowDropDown />}
+                  value={mk}
+                  onChange={(e) => setMk(e.target.value)}
+                >
+                  {mkList &&
+                    mkList.map((mkList) => (
+                      <option value={mkList.id} key={mkList.id}>
+                        {mkList.id + " " + mkList.nama}
+                      </option>
+                    ))}
+                </Select>
+                <Button type="submit" size="md" colorScheme="green" mx={4}>
+                  Add
+                </Button>
+              </InputGroup>
             </FormControl>
           </form>
           <Box
@@ -221,18 +225,21 @@ const Detail = () => {
                 </Thead>
 
                 <Tbody>
-                  {/* di bawah ini hanya placeholder untuk maping :) */}
                   {mahasiswa.matakuliah?.map((mk) => (
-                      <Tr key={mk.id}>
-                        <Td>{mk.id}</Td>
-                        <Td>{mk.nama}</Td>
-                        <Td>
-                            <Button size="sm" colorScheme="red" onClick={() => deleteMk(mk.id)}>
-                              Delete
-                            </Button>
-                          </Td>
-                      </Tr>
-                    ))}
+                    <Tr key={mk.id}>
+                      <Td>{mk.id}</Td>
+                      <Td>{mk.nama}</Td>
+                      <Td>
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          onClick={() => deleteMk(mk.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
                 </Tbody>
               </Table>
             </TableContainer>

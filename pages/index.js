@@ -29,8 +29,8 @@ export default function Home() {
     try {
       const res = await backend.get(`/mahasiswa`);
 
-      console.log(res.data.mahasiswa);
-      setMahasiswas(res.data.mahasiswa);
+      console.log(res.data.data.mahasiswa);
+      setMahasiswas(res.data.data.mahasiswa);
     } catch (error) {
       console.log(error);
     }
@@ -61,25 +61,6 @@ export default function Home() {
     setUser(null);
   };
 
-  const handleDelete = async (nim) => {
-    try {
-      const res = await backend.delete(`/mahasiswa/${nim}`, {
-        headers: {
-          token,
-          validateStatus: false,
-        },
-      });
-
-      const data = res.data;
-      console.log(data);
-      getAllMahasiswa();
-      handleLogout();
-      alert("mahasiswa deleted");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
   useEffect(() => {
     hasUserLogedIn();
     getAllMahasiswa();
@@ -94,7 +75,11 @@ export default function Home() {
       pb={10}
       px={10}
     >
-      <Navbar user={user} handleLogout={handleLogout} />
+      <Navbar
+        user={user}
+        handleLogout={handleLogout}
+        handleLogin={() => router.push("/login")}
+      />
 
       <Box
         rounded="lg"
@@ -122,18 +107,13 @@ export default function Home() {
                     <Td>{mahasiswa.nama}</Td>
                     <Td>{mahasiswa.angkatan}</Td>
                     <Td>
-                      <ButtonGroup>
-                        <Button size="sm" colorScheme="green" onClick={() => router.push(`/users/${mahasiswa.nim}`)}>
-                          Detail
-                        </Button>
-                        <Button
-                          size="sm"
-                          colorScheme="red"
-                          onClick={() => handleDelete}
-                        >
-                          Delete
-                        </Button>
-                      </ButtonGroup>
+                      <Button
+                        size="sm"
+                        colorScheme="green"
+                        onClick={() => router.push(`/users/${mahasiswa.nim}`)}
+                      >
+                        Detail
+                      </Button>
                     </Td>
                   </Tr>
                 ))}

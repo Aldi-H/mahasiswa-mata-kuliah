@@ -13,11 +13,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const Navbar = ({ user, handleLogout }) => {
+const Navbar = ({ user, handleLogout, handleLogin, homepage }) => {
   return (
     <Box px={10}>
       <Flex my={5} h={16} alignItems="center" justifyContent="space-between">
-        <Heading as="h2" size="md">
+        <Heading as="h2" size="md" onClick={homepage} cursor="pointer">
           Mahasiswa Mata Kuliah
         </Heading>
 
@@ -41,7 +41,7 @@ const Navbar = ({ user, handleLogout }) => {
               </Menu>
             </>
           ) : (
-            <Link href="./login">
+            <Link onClick={handleLogin}>
               <Button>Login</Button>
             </Link>
           )}
