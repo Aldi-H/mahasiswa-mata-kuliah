@@ -25,6 +25,7 @@ import { MdArrowDropDown } from "react-icons/md";
 import Navbar from "../../components/navbar";
 import backend from "../../api/backend";
 import { AuthContext } from "../../utils/AuthContext";
+import { useRouter } from "next/router";
 
 const Detail = () => {
   const [mahasiswa, setMahasiswa] = useState([]);
@@ -32,17 +33,18 @@ const Detail = () => {
   const [mk, setMk] = useState("");
   const [mkList, setMkList] = useState([]);
   const { token, setToken } = useContext(AuthContext);
+  const router = useRouter();
 
-  // const getMahasiswa = async (nim) => {
-  //   try {
-  //     const res = await backend.get(`/mahasiswa/${nim}`);
+  const getMahasiswa = async (nim) => {
+    try {
+      const res = await backend.get(`/mahasiswa/${nim}`);
 
-  //     console.log(res.data.data.mahasiswa);
-  //     setMahasiswa(res.data.data.mahasiswa);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+      console.log(res.data.mahasiswa.matakuliah);
+      setMahasiswa(res.data.mahasiswa);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getMk = async () => {
     try {
@@ -76,10 +78,11 @@ const Detail = () => {
   };
 
   // add matakuliah
-  const addMk = async () => {
+  const addMk = async (e) => {
+    e.preventDefault();
     try {
       const res = await backend.post(
-        `/mahasiswa/matakuliah/${mkId}`,
+        `/mahasiswa/matakuliah/${mk}`,
         {
           matakuliah: mk,
         },
@@ -97,11 +100,39 @@ const Detail = () => {
       }
 
       alert(res.data.message);
+      getMahasiswa(router.query.nim);
       return;
     } catch (error) {
       console.log(error);
     }
   };
+
+  const deleteMk = async (mkId) => {
+    console.log(token);
+    try {
+      const res = await backend.put(
+        `/mahasiswa/matakuliah/${mkId}`,
+        {},
+        {
+          headers: {
+            token,
+            validateStatus: false,
+          },
+        },
+      );
+
+      if (res.status !== 200) {
+        alert(res.data.message);
+        return;
+      }
+
+      alert(res.data.message);
+      getMahasiswa(router.query.nim);
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleLogout = () => {
     setToken(null);
@@ -109,10 +140,10 @@ const Detail = () => {
   };
 
   useEffect(() => {
-    // getMahasiswa();
-    // hasUserLogedIn();
+    getMahasiswa(router.query.nim);
     getMk();
-  }, []);
+    hasUserLogedIn();
+  }, [token]);
 
   return (
     <Box
@@ -149,26 +180,28 @@ const Detail = () => {
             {mahasiswa.nim}
           </Text>
 
-          <FormControl p={8}>
-            <InputGroup>
-              <Select
-                placeholder="Pilih Mata Kuliah"
-                icon={<MdArrowDropDown />}
-                value={mk}
-                onChange={(e) => setMk(e.target.value)}
-              >
-                {mkList &&
-                  mkList.map((mkList) => (
-                    <option value={mkList.nama} key={mkList.id}>
-                      {mkList.nama}
-                    </option>
-                  ))}
-              </Select>
-              <Button size="md" colorScheme="green" mx={4} onSubmit={addMk}>
-                Add
-              </Button>
-            </InputGroup>
-          </FormControl>
+          <form onSubmit={addMk}>
+            <FormControl p={8}>
+                <InputGroup>
+                  <Select
+                    placeholder="Pilih Mata Kuliah"
+                    icon={<MdArrowDropDown />}
+                    value={mk}
+                    onChange={(e) => setMk(e.target.value)}
+                  >
+                    {mkList &&
+                      mkList.map((mkList) => (
+                        <option value={mkList.id} key={mkList.id}>
+                          {mkList.id + " " + mkList.nama}
+                        </option>
+                      ))}
+                  </Select>
+                  <Button type="submit" size="md" colorScheme="green" mx={4}>
+                    Add
+                  </Button>
+                </InputGroup>
+            </FormControl>
+          </form>
           <Box
             justifyContent="center"
             alignItems="center"
@@ -181,7 +214,7 @@ const Detail = () => {
               <Table>
                 <Thead>
                   <Tr>
-                    <Th>No</Th>
+                    <Th>Kode MK</Th>
                     <Th>Mata Kuliah</Th>
                     <Th>Action</Th>
                   </Tr>
@@ -189,16 +222,15 @@ const Detail = () => {
 
                 <Tbody>
                   {/* di bawah ini hanya placeholder untuk maping :) */}
-                  {mkList &&
-                    mkList.map((mk) => (
+                  {mahasiswa.matakuliah?.map((mk) => (
                       <Tr key={mk.id}>
                         <Td>{mk.id}</Td>
                         <Td>{mk.nama}</Td>
                         <Td>
-                          <Button size="sm" colorScheme="red">
-                            Delete
-                          </Button>
-                        </Td>
+                            <Button size="sm" colorScheme="red" onClick={() => deleteMk(mk.id)}>
+                              Delete
+                            </Button>
+                          </Td>
                       </Tr>
                     ))}
                 </Tbody>
