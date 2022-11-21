@@ -81,7 +81,7 @@ const Detail = () => {
     e.preventDefault();
     try {
       const res = await backend.post(
-        `/mahasiswa/matakuliah/${mk}`,
+        `/mahasiswa/${mahasiswa.nim}/matakuliah/${mk}`,
         {
           matakuliah: mk,
         },
@@ -106,11 +106,11 @@ const Detail = () => {
     }
   };
 
-  const deleteMk = async (mkId) => {
+  const deleteMk = async (mkId, nim) => {
     console.log(token);
     try {
       const res = await backend.put(
-        `/mahasiswa/matakuliah/${mkId}`,
+        `/mahasiswa/${nim}/matakuliah/${mkId}`,
         {},
         {
           headers: {
@@ -233,7 +233,7 @@ const Detail = () => {
                         <Button
                           size="sm"
                           colorScheme="red"
-                          onClick={() => deleteMk(mk.id)}
+                          onClick={() => deleteMk(mk.id, router.query.nim)}
                         >
                           Delete
                         </Button>

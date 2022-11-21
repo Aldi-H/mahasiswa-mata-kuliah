@@ -29,8 +29,8 @@ export default function Home() {
     try {
       const res = await backend.get(`/mahasiswa`);
 
-      console.log(res.data.data.mahasiswa);
-      setMahasiswas(res.data.data.mahasiswa);
+      console.log(res.data.mahasiswa);
+      setMahasiswas(res.data.mahasiswa);
     } catch (error) {
       console.log(error);
     }
@@ -65,6 +65,7 @@ export default function Home() {
     hasUserLogedIn();
     getAllMahasiswa();
   }, [token]);
+
   return (
     <Box
       justifyContent="center"
